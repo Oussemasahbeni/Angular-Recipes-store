@@ -13,7 +13,12 @@ export class RecipeListComponent implements OnDestroy {
 
   recipes: Recipe[] = [];
   constructor(private recipeService: RecipesService, private router: Router, private route: ActivatedRoute) {
-    this.recipes = this.recipeService.getRecipes();
+    this.recipeService.fetchRecipes().subscribe(
+      (recipes) => {
+        // console.log(recipes)
+        this.recipes = recipes
+      }
+    );
     this.recipeService.recipeChanged.subscribe((recipes) => {
       this.recipes = recipes
     })

@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core';
 import { Recipe } from '../recipes/recipes.model';
 import { Ingredient } from '../shared/ingredient.model';
 import { ShoppingListService } from './shopping-list.service';
-import { Subject } from 'rxjs';
+import { Subject, map, tap } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { response } from 'express';
 
 @Injectable({
   providedIn: 'root'
@@ -11,27 +13,61 @@ export class RecipesService {
 
   recipeChanged = new Subject<Recipe[]>();
 
-  private recipes: Recipe[] = [new Recipe('A Test Recipe',
-    'This is simply a test',
-    'https://www.inspiredtaste.net/wp-content/uploads/2018/12/Sauteed-Zucchini-Recipe-2-1200.jpg',
-    [new Ingredient('Meat', 1), new Ingredient('French Fries', 20)]
-  ),
-  new Recipe('Another Test Recipe', 'This is simply a test', 'https://www.inspiredtaste.net/wp-content/uploads/2018/12/Sauteed-Zucchini-Recipe-2-1200.jpg',
-    [new Ingredient('Buns', 4), new Ingredient('Meat', 22)]
-  ),];
+  url = 'https://recipe-book-ce086-default-rtdb.europe-west1.firebasedatabase.app/recipes.json'
 
+  // private recipes: Recipe[] = [new Recipe('A Test Recipe',
+  //   'This is simply a test',
+  //   'https://www.inspiredtaste.net/wp-content/uploads/2018/12/Sauteed-Zucchini-Recipe-2-1200.jpg',
+  //   [new Ingredient('Meat', 1), new Ingredient('French Fries', 20)]
+  // ),
+  // new Recipe('Another Test Recipe', 'This is simply a test', 'https://www.inspiredtaste.net/wp-content/uploads/2018/12/Sauteed-Zucchini-Recipe-2-1200.jpg',
+  //   [new Ingredient('Buns', 4), new Ingredient('Meat', 22)]
+  // ),];
+
+  private recipes: Recipe[] = []
 
   getRecipes() {
-    return this.recipes.slice();
+    return this.http.get<Recipe[]>(this.url)
   }
 
   getRecipe(id: number) {
     return this.recipes[id];
   }
 
+
+
+
+  storeRecipes() {
+    this.http.post<Recipe[]>(this.url, this.recipes).subscribe((response) => {
+      // console.log(response)
+    })
+  }
+
+  fetchRecipes() {
+    return this.http.get<Recipe[]>(this.url)
+      .pipe(map(items => {
+        // console.log(items)
+        return items.map(recipe => {
+          return { ...recipe, ingredients: recipe.ingredients ? recipe.ingredients : [] }
+        })
+      }),
+        tap(recipe => {
+          // console.log(recipe)
+          this.recipes = recipe;
+        })
+      )
+    // .subscribe((response) => {
+    //   this.recipes = response;
+    //   this.recipeChanged.next(this.recipes.slice())
+    // })
+  }
   addRecipe(recipe: Recipe) {
     this.recipes.push(recipe)
     this.recipeChanged.next(this.recipes.slice())
+
+    // this.http.put<Recipe[]>(this.url, this.recipes).subscribe((response) => {
+    //   console.log(response)
+    // })
 
 
   }
@@ -50,6 +86,6 @@ export class RecipesService {
   }
 
 
-  constructor(private shoppingService: ShoppingListService) { }
+  constructor(private shoppingService: ShoppingListService, private http: HttpClient) { }
 
 }
