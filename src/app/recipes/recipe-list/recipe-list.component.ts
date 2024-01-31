@@ -2,6 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { Recipe } from '../recipes.model';
 import { RecipesService } from '../../services/recipes.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-recipe-list',
@@ -12,6 +13,8 @@ export class RecipeListComponent implements OnDestroy {
 
 
   recipes: Recipe[] = [];
+  private recipeChangedSubscription: Subscription;
+
   constructor(private recipeService: RecipesService, private router: Router, private route: ActivatedRoute) {
     this.recipeService.fetchRecipes().subscribe(
       (recipes) => {
@@ -19,7 +22,7 @@ export class RecipeListComponent implements OnDestroy {
         this.recipes = recipes
       }
     );
-    this.recipeService.recipeChanged.subscribe((recipes) => {
+    this.recipeChangedSubscription = this.recipeService.recipeChanged.subscribe((recipes) => {
       this.recipes = recipes
     })
   }
@@ -30,7 +33,7 @@ export class RecipeListComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.recipeService.recipeChanged.unsubscribe()
+    this.recipeChangedSubscription.unsubscribe()
   }
 
 

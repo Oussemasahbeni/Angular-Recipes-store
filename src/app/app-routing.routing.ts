@@ -6,6 +6,7 @@ import { RecipesStartComponent } from './recipes/recipes-start/recipes-start.com
 import { RecipeDetailComponent } from './recipes/recipe-detail/recipe-detail.component';
 import { RecipesEditComponent } from './recipes/recipes-edit/recipes-edit.component';
 import { ResolverService, recipeResolver } from './recipes/resolver.service';
+import { AuthComponent } from './auth/auth.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/recipes', pathMatch: 'full' },
@@ -13,12 +14,13 @@ const routes: Routes = [
     path: 'recipes', component: RecipesComponent, children: [
       { path: '', component: RecipesStartComponent },
       { path: 'new', component: RecipesEditComponent },
-      { path: ':id', component: RecipeDetailComponent,resolve: [recipeResolver] },
+      { path: ':id', component: RecipeDetailComponent, resolve: [recipeResolver] },
       { path: ':id/edit', component: RecipesEditComponent, resolve: [recipeResolver] },
 
     ]
   },
-  { path: 'shopping-list', component: ShoppingListComponent }
+  { path: 'shopping-list', component: ShoppingListComponent },
+  { path: 'auth', component: AuthComponent }
 ];
 
 export const AppRoutingRoutes = RouterModule.forRoot(routes);

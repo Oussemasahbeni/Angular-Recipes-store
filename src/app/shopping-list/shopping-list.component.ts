@@ -19,6 +19,7 @@ export class ShoppingListComponent implements OnDestroy {
     })
   }
   ngOnDestroy(): void {
+    console.log('destroyed')
     this.igChangedSub.unsubscribe();
   }
 

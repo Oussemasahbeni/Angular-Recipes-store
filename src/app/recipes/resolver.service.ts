@@ -20,10 +20,7 @@ export class ResolverService {
 
   }
 
-
-
 }
-
 
 export const recipeResolver: ResolveFn<Recipe[]> =
   (route: ActivatedRouteSnapshot, state: RouterStateSnapshot,) => {

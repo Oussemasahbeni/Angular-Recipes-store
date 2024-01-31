@@ -34,6 +34,7 @@
           <div class="form-group">
             <label for="imageUrl">ImagePath</label>
             <input
+              title="imagePath"
               type="text"
               id="image"
               class="form-control"
@@ -71,11 +72,17 @@
             style="margin-top: 10px"
           >
             <div class="col-xs-8">
-              <input type="text" class="form-control" formControlName="name" />
+              <input
+                type="text"
+                title="name"
+                class="form-control"
+                formControlName="name"
+              />
             </div>
 
             <div class="col-xs-2">
               <input
+                title="amount"
                 type="number"
                 class="form-control"
                 formControlName="amount"

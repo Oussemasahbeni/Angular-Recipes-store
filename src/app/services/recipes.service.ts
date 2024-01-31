@@ -38,6 +38,7 @@ export class RecipesService {
 
 
   storeRecipes() {
+    console
     this.http.post<Recipe[]>(this.url, this.recipes).subscribe((response) => {
       // console.log(response)
     })
@@ -62,12 +63,13 @@ export class RecipesService {
     // })
   }
   addRecipe(recipe: Recipe) {
+    // console.log(recipe)
     this.recipes.push(recipe)
     this.recipeChanged.next(this.recipes.slice())
 
-    // this.http.put<Recipe[]>(this.url, this.recipes).subscribe((response) => {
-    //   console.log(response)
-    // })
+    this.http.put<Recipe[]>(this.url, this.recipes).subscribe((response) => {
+      // console.log(response)
+    })
 
 
   }

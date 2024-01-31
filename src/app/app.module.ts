@@ -15,6 +15,8 @@ import { RouterModule } from '@angular/router';
 import { RecipesStartComponent } from './recipes/recipes-start/recipes-start.component';
 import { RecipesEditComponent } from './recipes/recipes-edit/recipes-edit.component';
 import { HttpClientModule } from '@angular/common/http';
+import { AuthComponent } from './auth/auth.component';
+import { LoadingSpinnerComponent } from './shared/loading-spinner/loading-spinner/loading-spinner.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +30,10 @@ import { HttpClientModule } from '@angular/common/http';
     RecipeItemComponent,
     DropdownDirective,
     RecipesStartComponent,
-    RecipesEditComponent
+    RecipesEditComponent,
+    AuthComponent,
+    LoadingSpinnerComponent
+
   ],
   imports: [
     BrowserModule,
