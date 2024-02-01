@@ -2,9 +2,10 @@ import { Injectable } from '@angular/core';
 import { Recipe } from '../recipes/recipes.model';
 import { Ingredient } from '../shared/ingredient.model';
 import { ShoppingListService } from './shopping-list.service';
-import { Subject, map, tap } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
-import { response } from 'express';
+import { Subject, exhaustMap, map, take, tap } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { AuthService } from './auth.service';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -15,15 +16,7 @@ export class RecipesService {
 
   url = 'https://recipe-book-ce086-default-rtdb.europe-west1.firebasedatabase.app/recipes.json'
 
-  // private recipes: Recipe[] = [new Recipe('A Test Recipe',
-  //   'This is simply a test',
-  //   'https://www.inspiredtaste.net/wp-content/uploads/2018/12/Sauteed-Zucchini-Recipe-2-1200.jpg',
-  //   [new Ingredient('Meat', 1), new Ingredient('French Fries', 20)]
-  // ),
-  // new Recipe('Another Test Recipe', 'This is simply a test', 'https://www.inspiredtaste.net/wp-content/uploads/2018/12/Sauteed-Zucchini-Recipe-2-1200.jpg',
-  //   [new Ingredient('Buns', 4), new Ingredient('Meat', 22)]
-  // ),];
-
+  constructor(private shoppingService: ShoppingListService, private http: HttpClient, private authService: AuthService) { }
   private recipes: Recipe[] = []
 
   getRecipes() {
@@ -34,9 +27,6 @@ export class RecipesService {
     return this.recipes[id];
   }
 
-
-
-
   storeRecipes() {
     console
     this.http.post<Recipe[]>(this.url, this.recipes).subscribe((response) => {
@@ -45,22 +35,21 @@ export class RecipesService {
   }
 
   fetchRecipes() {
+
     return this.http.get<Recipe[]>(this.url)
-      .pipe(map(items => {
-        // console.log(items)
-        return items.map(recipe => {
-          return { ...recipe, ingredients: recipe.ingredients ? recipe.ingredients : [] }
-        })
-      }),
+      .pipe(
+        map(items => {
+          // console.log(items)
+          return items.map(recipe => {
+            return { ...recipe, ingredients: recipe.ingredients ? recipe.ingredients : [] }
+          })
+        }),
         tap(recipe => {
           // console.log(recipe)
           this.recipes = recipe;
-        })
-      )
-    // .subscribe((response) => {
-    //   this.recipes = response;
-    //   this.recipeChanged.next(this.recipes.slice())
-    // })
+        }));
+
+
   }
   addRecipe(recipe: Recipe) {
     // console.log(recipe)
@@ -88,6 +77,6 @@ export class RecipesService {
   }
 
 
-  constructor(private shoppingService: ShoppingListService, private http: HttpClient) { }
+
 
 }
