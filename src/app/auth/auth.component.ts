@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ComponentFactoryResolver, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthResponseData, AuthService } from '../services/auth.service';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { Router } from '@angular/router';
+import { AlertComponentComponent } from '../shared/alert/AlertComponent/AlertComponent.component';
+import { PlaceholderDirective } from '../shared/placeholder/placeholder.directive';
 
 
 @Component({
@@ -10,15 +12,19 @@ import { Router } from '@angular/router';
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.css']
 })
-export class AuthComponent implements OnInit {
+export class AuthComponent implements OnInit, OnDestroy {
 
   isLoginMode = true;
   isLoading = false;
   error: string = '';
 
+  private closeSub: Subscription | undefined = new Subscription();
+
+  @ViewChild(PlaceholderDirective, { static: false }) alertHost: PlaceholderDirective | undefined;
+
   authForm: FormGroup = new FormGroup({});
 
-  constructor(public auth: FormBuilder, private authService: AuthService, private router: Router) { }
+  constructor(public auth: FormBuilder, private authService: AuthService, private router: Router, private componentFactoryResolver: ComponentFactoryResolver) { }
 
   ngOnInit() {
     this.authForm = this.auth.group({
@@ -62,6 +68,7 @@ export class AuthComponent implements OnInit {
         error: (e) => {
           console.error(e);
           this.error = e.message;
+          this.showErrorAlert(e.message);
           // console.log(this.error)
           this.isLoading = false;
         },
@@ -69,6 +76,36 @@ export class AuthComponent implements OnInit {
       }
     )
     this.authForm.reset();
+  }
+
+  private showErrorAlert(message: string) {
+    // first we need to create a component factory, a component factory is a class that knows how to create a component.
+    const alertCmpFct = this.componentFactoryResolver.resolveComponentFactory(AlertComponentComponent)
+    // then we need to get the view container ref of the place where we want to render the component.
+    // we can get the view container ref using the @ViewChild decorator.
+    const hostViewContainerRef = this.alertHost?.viewContainerRef;
+    // clear the view container ref to remove any component that is already rendered.
+    hostViewContainerRef?.clear();
+    // then we need to create the component using the component factory.
+    const componentRef = hostViewContainerRef?.createComponent(alertCmpFct)
+    // then we need to set the properties of the component.
+    if (componentRef && componentRef.instance) {
+      componentRef.instance.message = message;
+    }
+
+    this.closeSub = componentRef?.instance.close.subscribe(() => {
+      this.closeSub?.unsubscribe();
+      hostViewContainerRef?.clear();
+    });
+  }
+  ngOnDestroy(): void {
+    if (this.closeSub) {
+      this.closeSub.unsubscribe();
+    }
+
+  }
+  onHandleError() {
+    this.error = '';
   }
 
 }
