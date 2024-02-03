@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, Subject, catchError, tap, throwError } from 'rxjs';
 import { User } from '../auth/user.model';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment.development';
 
 
 export interface AuthResponseData {
@@ -21,7 +22,7 @@ export interface AuthResponseData {
 export class AuthService {
 
   user = new BehaviorSubject<User | null>(null);
-  private apiKey = 'AIzaSyD-iaGRvttHr3azc0z00glZjL8gzcvjp-4';
+  private apiKey = environment.firebaseAPIKey;
   private tokenExpirationTimer: any;
 
   constructor(private http: HttpClient, private router: Router) { }
